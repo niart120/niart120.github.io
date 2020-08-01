@@ -74,7 +74,7 @@ class RNGMap{
 
 function main(){
 	$('#specifyaddr').on('click',domSpecifyModal);
-	$('#checkencount').on('click',()=>{});
+	$('#checkencount').on('click',domCheckEncount);
 }
 
 function domSpecifyModal(){
@@ -94,7 +94,6 @@ function domSpecifyModal(){
 }
 
 function specifyaddr(){
-	//TODO 位置特定の処理を書く
 	const seed = Number($('#specifyseed').val());
 	const size = Number($('#size').val());
 	const rawinfo = Number($('#omikuji').val());
@@ -103,6 +102,25 @@ function specifyaddr(){
 	const rngmap = new RNGMap(seed);
 	const omikuji_table = rngmap.get_omikujirands();
 
+	//検索用ハッシュテーブルの作成
+	const rnghashes = makeRngHashtable(omikuji_table);
+
+	//hash検索用にデータを変換
+	const rnginfo = convertOmikujiToRnginfo(rawinfo);
+
+	//検索
+	const result = new Array();
+	let idx = 0
+	while(true){
+		idx = rnghashes.indexOf(rnginfo,idx);
+		if(Number(idx)===-1)break;
+		result.push(idx+size);
+		idx++;
+	}
+	return result;
+}
+
+function makeRngHashtable(omikuji_table){
 	const rnghashes = new Array();
 	let hash = 0;
 	
@@ -120,30 +138,29 @@ function specifyaddr(){
 		rnghashes.push(hash);
 	}
 
-	const convertOmikujiToRnginfo = ((rawinfo)=>{
-		let rnginfo = 0;
-		rawinfo = rawinfo.toString();
-		for (let i = 0;i<rawinfo.length;i++) {
-			rnginfo<<=2;
-			const r_i = Number(rawinfo.charAt(i));
-			rnginfo |= r_i;
-		}
-		return rnginfo;
-	});
+	return rnghashes;
+}
 
-	//hash検索用にデータを変換
-	const rnginfo = convertOmikujiToRnginfo(rawinfo);
-
-	//検索
-	const result = new Array();
-	let idx = 0
-	while(true){
-		idx = rnghashes.indexOf(rnginfo,idx);
-		if(Number(idx)===-1)break;
-		result.push(idx+size);
-		idx++;
+function convertOmikujiToRnginfo(rawinfo){
+	let rnginfo = 0;
+	rawinfo = rawinfo.toString();
+	for (let i = 0;i<rawinfo.length;i++) {
+		rnginfo<<=2;
+		const r_i = Number(rawinfo.charAt(i));
+		rnginfo |= r_i;
 	}
-	return result;
+	return rnginfo;
+}
+
+function domCheckEncount(){
+	const modal = $('#encountModal').find('.modal-body');
+	let result = '';
+	modal.html(result);
+	$('#encountModal').modal('show');
+}
+
+function checkEncount(){
+	
 }
 
 $(function(){
