@@ -5,11 +5,13 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<meta name="twitter:card" content="summary"></meta>
-	<meta name="twitter:title" content="smt1-rng">
+	<meta name="twitter:title" content="真・女神転生 乱数調整用ツール -niart120.github.io">
 
 	<!-- Bootstrap CSS -->
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
-	<title>niart120.github.io -smt1-rng</title>
+	<link rel="stylesheet" href="css/smt1-rng.css">
+
+	<title>真・女神転生 乱数調整用ツール -niart120.github.io</title>
 </head>
 <body>
 	<div class="container bg-secondary">
@@ -41,15 +43,15 @@
 				<div class="row align-items-center">
 					<div class="form-inline">
 						<label for="specifyseed">初期乱数:0x</label>
-						<input type="text" class="form-control" id = "specifyseed" value = "00" placeholder="00">
+						<input type="text" class="form-control" id = "specifyseed" value = "00" autocomplete="off" placeholder="00">
 					</div>
 					<div class="form-inline">
 						<label for="size">おみくじの数:</label>
-						<input type="text" readonly class="form-control" id = "size" value = 10>
+						<input type="text" readonly class="form-control" id = "size" autocomplete="off" value = 10>
 					</div>
 					<div class="form-inline">
 						<label for="omikuji">おみくじの結果</label>
-						<input type="text" class="form-control" id = "omikuji" placeholder="1012110110">
+						<input type="text" class="form-control" id = "omikuji" autocomplete="off" placeholder="1012110110">
 					</div>
 					<div class="col-auto">
 						<button id = "specifyaddr" class = "btn btn-primary mb-2">計算</button>
@@ -68,6 +70,8 @@
 					    </div>
 					  </div>
 					</div>
+					<!-- End Modal -->
+
 				</div>
 			</div>
 		</div>
@@ -78,15 +82,30 @@
 				<div class="row align-items-center">
 					<div class="form-inline">
 						<label for="checker_seed">初期乱数:0x</label>
-						<input type="text" class="form-control" id = "checker_seed" value = "00" placeholder="00">
+						<input type="text" class="form-control" id = "checkerseed" value = "00" autocomplete="off" placeholder="00">
 					</div>
 					<div class="form-inline">
 						<label for="addr">乱数位置</label>
-						<input type="text" class="form-control" id = "addr" placeholder="1234">
+						<input type="text" class="form-control" id = "addr" autocomplete="off" placeholder="1234">
 					</div>
 					<div class="col-auto">
 						<button id = "checkencount" class = "btn btn-primary mb-2">計算</button>
 					</div>
+					<!-- Modal -->
+					<div class="modal fade" id="encountModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+					  <div class="modal-dialog" role="document">
+					    <div class="modal-content">
+					      <div class="modal-header">
+					        <h5 class="modal-title">Result</h5>
+					      </div>
+					      <div class="modal-body"></div>
+					      <div class="modal-footer">
+							<button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+					      </div>
+					    </div>
+					  </div>
+					</div>
+					<!-- End Modal -->
 				</div>
 			</div>
 		</div>
