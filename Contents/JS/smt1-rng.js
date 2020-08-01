@@ -108,7 +108,7 @@ function specifyaddr(){
 	const omikuji_table = rngmap.get_omikujirands();
 
 	//検索用ハッシュテーブルの作成
-	const rnghashes = makeRngHashtable(omikuji_table);
+	const rnghashes = makeRngHashtable(omikuji_table,size);
 
 	//hash検索用にデータを変換
 	const rnginfo = convertOmikujiToRnginfo(rawinfo);
@@ -125,7 +125,7 @@ function specifyaddr(){
 	return result;
 }
 
-function makeRngHashtable(omikuji_table){
+function makeRngHashtable(omikuji_table,size){
 	const rnghashes = new Array();
 	let hash = 0;
 	
