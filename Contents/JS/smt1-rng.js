@@ -70,6 +70,11 @@ class RNGMap{
             return this.rands.slice().map(omikuji);
         };
     }
+
+    get_modrands(m){
+    	const mod = ((p)=>p%m);
+    	return this.rands.slice().map(mod);
+    }
 }
 
 function main(){
@@ -153,14 +158,35 @@ function convertOmikujiToRnginfo(rawinfo){
 }
 
 function domCheckEncount(){
+	const encountinfo = checkEncount();
 	const modal = $('#encountModal').find('.modal-body');
 	let result = '';
+	if (Number(encountinfo["majin"])===-1 || Number(encountinfo["rare"]===-1)){
+		result += '<p>検索に失敗しました.</p>'
+	}else{
+		result += '<p>魔人遭遇まであと'+(encountinfo["majin"])+'消費';
+		result += '<p>レアエンカ遭遇まであと'+(encountinfo["rare"])+'消費';
+	}
 	modal.html(result);
 	$('#encountModal').modal('show');
 }
 
 function checkEncount(){
-	
+	const seed = Number($('#checkerseed').val());
+	const addr = Number($('#addr').val());
+	const rngmap = new RNGMap(seed);
+	const rngtable = rngmap.rands;
+	const rnglowertable = rngmap.get_modrands(16);
+
+	let majin = Number(rngtable.indexOf(0x00,addr)) - addr;
+	//魔人判定を見越してaddr+1
+	let rare = Number(rnglowertable.indexOf(0x0,addr+1)) - addr -1;
+
+	if (majin<0 || rare <0) return {"majin":-1,　"majin_target": "", "rare":-1};
+
+	//もし魔人判定を踏んだ先がレアエンカなら再計算
+	while(majin===rare) rare = rnglowertable.indexOf(0x0,addr+rare+2)-addr-1;
+	return {"majin":majin,　"majin_target": "", "rare":rare};
 }
 
 $(function(){
