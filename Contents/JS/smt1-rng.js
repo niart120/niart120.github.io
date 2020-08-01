@@ -75,6 +75,11 @@ class RNGMap{
     	const mod = ((p)=>p%m);
     	return this.rands.slice().map(mod);
     }
+
+    get_upperrands(){
+    	const shift = ((p)=>p>>8);
+    	return this.rands.slice().map(shift);
+    }
 }
 
 function main(){
@@ -176,7 +181,7 @@ function checkEncount(){
 	const addr = Number($('#addr').val());
 	const rngmap = new RNGMap(seed);
 	const rngtable = rngmap.rands;
-	const rnglowertable = rngmap.get_modrands(16);
+	const rnguppertable = rngmap.get_upperrands();
 
 	let majin = Number(rngtable.indexOf(0x00,addr)) - addr;
 	//魔人判定を見越してaddr+1
