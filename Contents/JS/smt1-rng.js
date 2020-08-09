@@ -185,12 +185,12 @@ function checkEncount(){
 
 	let majin = Number(rngtable.indexOf(0x00,addr)) - addr;
 	//魔人判定を見越してaddr+1
-	let rare = Number(rnglowertable.indexOf(0x0,addr+1)) - addr -1;
+	let rare = Number(rnguppertable.indexOf(0x0,addr+1)) - addr -1;
 
 	if (majin<0 || rare <0) return {"majin":-1,　"majin_target": "", "rare":-1};
 
 	//もし魔人判定を踏んだ先がレアエンカなら再計算
-	while(majin===rare) rare = rnglowertable.indexOf(0x0,addr+rare+2)-addr-1;
+	while(majin===rare) rare = rnguppertable.indexOf(0x0,addr+rare+2)-addr-1;
 	return {"majin":majin,　"majin_target": "", "rare":rare};
 }
 
