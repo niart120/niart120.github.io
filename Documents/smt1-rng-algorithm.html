@@ -26,7 +26,85 @@
         </div>
       </nav>
       <div class="border bg-light" style="padding:10px; margin:10px">
-        <h4>真女神転生 疑似乱数アルゴリズム</h4>
+        <div class="mx-5 my-3">
+          <h1>真・女神転生 疑似乱数アルゴリズム</h1>
+          <div class="mx-5">
+            <p>ここでは真・女神転生(SFC版)の疑似乱数生成アルゴリズムについての解説と, 先駆者によって示唆されていた, 既存の手法とは異なるアプローチでの乱数調整手法について紹介します.</p>
+            <p>文末に参考文献を記載してあるのでそちらもご参照ください.</p>
+            <hr>
+          </div>
+          <div class="mx-2">
+            <h4>疑似乱数アルゴリズム</h4>
+            <div class="mx-5">
+              <p>
+                ゲーム上でのランダムな事象(命中判定, 回復量, 敵の行動, レアな敵の出現判定etc)を生成するためには, 疑似乱数を生成する必要があります.
+                この疑似乱数を生成するアルゴリズムはゲームによって様々ではありますが, 一部のゲームでは生成される乱数の質が良くないアルゴリズムを採用していたり, その実装がずさんなため, 所謂<strong>"乱数調整"</strong>が可能となってしまっています.
+              </p>
+              <p>真・女神転生(SFC版)では, 線形帰還フィードバックレジスタ(LRFR)と繰り上がり加算を組み合わせることで, 0から255までの範囲の疑似乱数を生成しています.</p>
+              <p>高級言語ではなじみのない言葉も多々出てくるので合わせて解説します.
+                <blockquote class="blockquote">
+                  <div class="border" style="padding:10px; margin:10px">
+                    <p>
+                      乱数計算に関係するメモリは現在乱数１バイト、計算に使われる内部変数が３バイト。<br>
+                      以下三つの内部変数を仮に[A][B][C]とする。hは数値が16進数である事を表す。<br>
+                      アキュームレータは計算結果を一時保存する領域の事。
+                    </p>
+                    <p>
+                      [A]をキャリー付き左シフト。<br>
+                      [B]の1ビット目と2ビット目をXORして反転した値を[A]に加算。<br>
+                      [B]をキャリー付き左ローテート。<br>
+                      アキュームレータに[B]をロードして22hをキャリー付き加算。<br>
+                      アキュームレータに[A]をキャリー付き加算。<br>
+                      アキュームレータに5AhをXOR。<br>
+                      [C]にアキュームレータの値をキャリー付き加算。<br>
+                      現在乱数に[C]をXOR。
+                    </p>
+                  </div>
+                  <footer class="blockquote-footer">
+                    <cite><a href="https://smtlab.web.fc2.com/rng.html#mechanism">
+                        <Shin>Megami Tensei Labo 真・女神転生乱数調査室#基本的な仕組み</Shin></a></cite>
+                  </footer>
+                </blockquote>
+              </p>
+              <div class="mx-5">
+                <h5>メモ</h5>
+                <p>キャリーフラグ(キャリー)<code>carry</code>とは, キャリー付き加算(所謂繰り上がり加算), キャリー付き左シフトなどでの桁あふれ時に立つ, 1bitからなるフラグです.</p>
+                <p>フラグには,<br>
+                  <ul>
+                    <li>キャリー付き加算を実行したときの最上位ビットでの繰り上がりビット</li>
+                    <li>シフト演算時に溢れるビット</li>
+                  </ul>が代入されます.
+                </p>
+                <p>このフラグが立っているとき,<br> 
+                  <ul>
+                    <li>加算を実行すると加算演算後に+1を行います.</li>
+                    <li>左(右)ローテート命令を実行すると, 最下位(最上位)ビットに1を埋め込みます.</li>
+                  </ul>
+                </p>
+              </div>
+            </div>
+            <h4>アルゴリズムの概説</h4>
+            <div class="mx-5">
+              <p>内部変数<code>A</code>, <code>B</code>, <code>carry</code>をひとまとめ(<em>carry|B|A</em>)に17bitとして扱っていると考えると, この部分は線形帰還フィードバックレジスタになっています. これらの変数は長さ17bitのランダムビット列を生成します.</p>
+              <p>内部変数<code>C</code>は乱数生成を行うための内部状態を保持しています. <code>A</code>, <code>B</code>, 及びキャリーフラグの値をアキュムレータで加工して, <code>C</code>に加算していくことで内部状態を更新します.</p>
+              <p>初期乱数<code>Rnd</code>は, VC版(SwitchOnline版)の場合は<code>0</code>で固定です. <code>C</code>を<code>Rnd</code>にXORすることで乱数列の更新を行います.</p>
+            </div>
+            <h4>アルゴリズムの性質</h4>
+            <div class="mx-5">
+              <p>このアルゴリズムで生成される乱数列の長さは 113999個となります. 現代のコンピュータの処理性能をもってすれば, 容易く全探索が可能です.</p>
+              <p>\( \log_{2} 113999 \approx 16.8 \) より, ゲーム上で得られる17bitの情報から乱数列上の現在位置が特定できそうです.</p>
+              <p>
+                そこで, 連続するビットの情報から現在位置を特定することを考えます. 例えば, 連続する6つの下位\(3\)bit(=18bit)を観測したとき,
+                乱数列上で下位ビットがそのようになっている乱数の並びを検索すると, 
+              </p>
+              <P>(WIP)</P>
+              <p>実は下位ビットの情報だけでは乱数列上の位置を完全に特定することはできません.</p>
+              <p>この乱数生成アルゴリズムの下位\(k\)ビットは, \(113999/2^{(8-k)}\) 周期を持っており, 下位ビットの情報から特定しようとしても, 観測できたbit長に収まる周期の中でしか特定が出来ません.</p>
+              <p>先ほどの例では, 下位\(3\)bitを観測するため, \(113999/2^{(8-3)} \approx 3562\)周期内での特定しかできません.</p>
+              <p>しかしながら上位ビット含む情報をゲーム上で観測できる場合は話が変わってきます. 最上位ビットを含む情報が観測できるのであれば, 最大周期中での位置を特定できるため, 正確な乱数位置を特定することが可能です.</p>
+            </div>
+          </div>
+        </div>
       </div>
       <!-- Footer-->
       <footer class="page-footer font-small text-white bg-secondary">
@@ -38,6 +116,7 @@
       <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
       <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
       <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-AMS_CHTML"></script>
     </div>
   </body>
 </html>
