@@ -11,9 +11,9 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
   </head>
   <body>
-    <div class="container-fluid bg-secondary">
-      <div class="container">
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark"><a class="navbar-brand" href="#">niart120.github.io</a>
+    <div class="bg-secondary">
+      <div class="container bg-secondary">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark"><a class="navbar-brand" href="">niart120.github.io</a>
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
@@ -28,7 +28,7 @@
           </div>
         </nav>
         <div class="border bg-light" style="padding:10px; margin:10px">
-          <div class="mx-5 my-3">
+          <div class="mx-xl-5 my-3-xl">
             <h1>真・女神転生 疑似乱数アルゴリズム</h1>
             <div class="mx-3">
               <p class="text-justify">ここでは真・女神転生(SFC版)の疑似乱数生成アルゴリズムについての解説と, 先駆者によって示唆されていた, 既存の手法とは異なるアプローチでの乱数調整手法について紹介します.</p>
@@ -39,7 +39,7 @@
               <h4>疑似乱数アルゴリズム</h4>
               <div class="mx-3">
                 <p class="text-justify">
-                  ゲーム上でのランダムな事象(命中判定, 回復量, 敵の行動, レアな敵の出現判定etc)を生成するためには, 疑似乱数を生成する必要があります.
+                  ゲーム上でのランダムな事象(命中判定, 回復量, 敵の行動, レアな敵の出現判定etc)を生成するためには, 疑似乱数を生成する必要があります.<br class="visible-xs-block">
                   この疑似乱数を生成するアルゴリズムは, ゲームによって様々ではありますが, 一部のゲームでは生成される乱数の質が良くないアルゴリズムを採用していたり, その実装がずさんなため, 所謂<strong>"乱数調整"</strong>が可能となってしまっています.
                 </p>
                 <p class="text-justify">真・女神転生(SFC版)では, 線形帰還フィードバックレジスタ(LRFR)と繰り上がり加算を組み合わせることで, 0から255までの範囲の疑似乱数を生成しています.</p>
@@ -140,14 +140,17 @@
             <div class="mx-2">
               <h4>乱数調整への応用</h4>
               <div class="mx-3">
-                <p class="text-justify textindent1em">ところで, そもそも魔人やビッグフットといったレアエネミーにエンカウントするための条件とはなんでしょうか? 魔人との遭遇確率は一般に1/256と言われていますが, ビッグフットとの遭遇確率は何分の1でしょうか? </p>
+                <p class="text-justify textindent1em">
+                  ここでクイズのお時間です. 魔人との遭遇確率は一般に1/256と言われていますが, ビッグフットとの遭遇確率は何分の1でしょうか?<br class="visible-xs-block">
+                  この問いに答えるには, そもそも魔人やビッグフットといったレアエネミーにエンカウントするための条件を知る必要があります.
+                </p>
                 <p class="text-justify">これらの条件は乱数値を調べることで見つけることが出来ます. 実は固定敵部屋に進入した際には, 魔人との遭遇判定に1つ, 種別判定に1つで, 合わせて乱数が2つ消費されています. </p>
                 <p class="text-justify">1つ目の乱数では, 乱数値が<code>0x00</code>のときに魔人と遭遇することが確定します. 2つ目の乱数では, 1つ目で魔人遭遇が確定しているなら, 遭遇する魔人の種類を決定します. そうでない場合は, 上位4ビットが<code>0x0</code>の時, レアエンカウントが確定します. 従って先ほどのビックフットの質問の答えは1/16となります.</p>
                 <p class="text-justify">こうした調査をもとに先述の乱数の仕組みを悪用することで, 所謂乱数調整を行うことが出来ます.</p>
                 <p class="text-justify">既存の手法では, ゲーム開始直後の操作の固定化によって乱数消費を制御することで, 魔人との遭遇などの確率の低い事象を引き起こしていました. 確かに誰でも出来る方法ではありますが, 月齢を合わせる手間があったり, 複雑かつ失敗したら即リセットのややシビアな移動操作制御が求められます.</p>
                 <p class="text-justify">ビッグフット討伐RTAにて用いた手法では, 先述の方法で乱数位置を特定し, ツールによってレアエンカウント(上位ビットが<code>0x0</code>の乱数値)までに必要な消費数を計算して, その数だけおみくじや回復魔法によって乱数消費を行っています. もし魔人との遭遇を目標にするのであれば, 魔人遭遇判定時に乱数値が<code>0x00</code>となるまで消費を行えばよいです.</p>
                 <p class="text-justify">この方法ならば, 操作精度や月齢の条件を気にすることなく目的の敵と遭遇することが出来ます. 但し, 戦闘中の乱数については別途乱数調整が必要になるため, この方法のみを用いてストラディバリを入手するのは難度が高いです.</p>
-                <p class="text-justify">また, 乱数を消費するために大量のおみくじまたは回復魔法のためのMPが要求されるほか, 魔人と遭遇することを目的とする場合は, 目標乱数まで遠い場合は歩行などによる乱数消費で仕切りなおしをするなどの工夫が必要になります. このように, 既存の方法より大きく劣る部分も多いです.</p>
+                <p class="text-justify">また, 乱数を消費するために大量のおみくじまたは回復魔法のためのMPが要求されます. 魔人と遭遇することを目的とする場合は該当する乱数の出現頻度が低いがために, 目標乱数まで遠い場合は 歩行などによる乱数消費で仕切りなおしをするなどの工夫が必要になります. このように, 既存の方法より大きく劣る部分も多いです.</p>
                 <p class="text-justify">既存の真・女神転生での手法とは異なるアプローチでの乱数調整ではありますが, 操作精度や月齢の条件に依ることなく魔人やビッグフットの討伐が可能です. ぜひ一度お試しいただければ幸いです.</p>
               </div>
             </div>
@@ -177,11 +180,11 @@
           <!-- Copyright-->
         </footer>
         <!-- Footer-->
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-AMS_CHTML"></script>
       </div>
-      <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-      <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-AMS_CHTML"></script>
     </div>
   </body>
 </html>
