@@ -77,7 +77,7 @@ class RNGMap{
     }
 
     get_upperrands(){
-    	const shift = ((p)=>p>>8);
+    	const shift = ((p)=>p>>4);
     	return this.rands.slice().map(shift);
     }
 }
